@@ -58,7 +58,7 @@ const authOptions: NextAuthOptions = {
             if (passwordConfirm) {
               return user;
             } else {
-              console.error("Password tidak cocok");
+              console.error("Password anda salah");
               return null;
             }
           } else {
@@ -110,7 +110,7 @@ const authOptions: NextAuthOptions = {
             token.role = result.role;
           });
         } catch (error) {
-          console.error("Error dalam login dengan Google:", error);
+          console.error("Error login dengan Google:", error);
         }
       }
       return token;

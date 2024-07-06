@@ -22,7 +22,7 @@ const LoginView = () => {
 
     if (!email || !password) {
       setIsLoading(false);
-      setError("Kedua bidang harus diisi");
+      setError("Email dan Password harus diisi");
       return;
     }
 
