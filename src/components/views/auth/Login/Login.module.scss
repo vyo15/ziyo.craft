@@ -28,17 +28,41 @@
       }
     }
     &__button {
-        cursor: pointer;
+      cursor: pointer;
       background-color: #000;
       color: #ffffff;
       width: 100%;
       padding: 10px;
       border: none;
     }
-  }
+    &__devider {
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    &__other {
+      width: 100%;
+      &__buttonGoogle {
+        cursor: pointer;
+        background-color: #4285f4;
+        color: #ffffff;
+        width: 100%;
+        padding: 10px;
+        border: none;
+        gap: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+        i {
+          font-size: 24px;
+        }
+      }
+    }
 
-  &__link {
-    a {
+    &__link {
+      a {
         color: aqua;
-    }}
+      }
+    }
+  }
 }

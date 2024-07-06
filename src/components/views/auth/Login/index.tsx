@@ -22,7 +22,7 @@ const LoginView = () => {
 
     if (!email || !password) {
       setIsLoading(false);
-      setError("Both fields are required");
+      setError("Kedua bidang harus diisi");
       return;
     }
 
@@ -33,6 +33,7 @@ const LoginView = () => {
         password,
         callbackUrl,
       });
+      console.log("Credential signIn response:", res);
 
       if (!res?.error) {
         setIsLoading(false);
@@ -40,11 +41,31 @@ const LoginView = () => {
         push(callbackUrl);
       } else {
         setIsLoading(false);
-        setError("Email or Password is incorrect");
+        setError("Email atau Password salah");
       }
     } catch (error) {
       setIsLoading(false);
-      setError("Email or Password is incorrect");
+      setError("Email atau Password salah");
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    setError("");
+    try {
+      const res = await signIn("google", { redirect: false, callbackUrl });
+      console.log("Google signIn response:", res);
+
+      if (!res?.error) {
+        setIsLoading(false);
+        push(callbackUrl);
+      } else {
+        setIsLoading(false);
+        setError("Login Google gagal");
+      }
+    } catch (error) {
+      setIsLoading(false);
+      setError("Login Google gagal");
     }
   };
 
@@ -76,10 +97,20 @@ const LoginView = () => {
           <button type="submit" className={styles.login__form__button}>
             Login
           </button>
+          <hr className={styles.login__form__devider} />
+          <div className={styles.login__form__other} />
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className={styles.login__form__other__buttonGoogle}
+          >
+            <i className="bx bxl-google" />
+            Login Dengan Google
+          </button>
         </form>
       </div>
       <p className={styles.login__link}>
-        Dont have an account? <a href="register">Sign Up here</a>
+        Belum punya akun? <a href="register">Daftar disini</a>
       </p>
     </div>
   );
