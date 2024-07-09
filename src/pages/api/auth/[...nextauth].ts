@@ -2,7 +2,7 @@ import NextAuth, { DefaultSession, NextAuthOptions } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { loginWithGoogle, signIn } from "@/lib/firebase/service";
+import { loginWithGoogle, signIn } from "../../../services/auth";
 import { compare } from "bcrypt";
 
 // Extend the User type

@@ -1,0 +1,38 @@
+.button {
+  /* Gaya umum untuk semua tombol */
+  cursor: pointer;
+  background-color: #000;
+  color: #fff;
+  padding: 10px 30px;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.primary {
+  /* Gaya untuk tombol varian primary */
+  background-color: #000;
+  color: #fff;
+}
+
+// .secondary {
+  /* Gaya untuk tombol varian secondary */
+// }
+
+.google {
+  /* Gaya untuk tombol varian google */
+  background-color: #4285f4;
+  color: #ffffff;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  gap: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  i {
+    font-size: 24px;
+  }
+}

@@ -9,7 +9,6 @@ import {
   where,
 } from "firebase/firestore";
 import app from "./init";
-import bcrypt from "bcrypt";
 
 const firestore = getFirestore(app);
 
@@ -41,89 +40,33 @@ export async function retrieveDataById(collectionName: string, id: string) {
   }
 }
 
-export async function signUp(
-  userData: {
-    email: string;
-    fullname: string;
-    phone: string;
-    password: string;
-    role?: string;
-  },
+export async function retrieveDataByField(
+  collectionName: string,
+  field: string,
+  value: string
+) {
+  const q = query(
+    collection(firestore, collectionName),
+    where(field, "==", value)
+  );
+  const snapshot = await getDocs(q);
+  const data = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+  return data;
+}
+
+export async function addData(
+  collectionName: string,
+  data: any,
   Callback: Function
 ) {
   try {
-    const q = query(
-      collection(firestore, "users"),
-      where("email", "==", userData.email)
-    );
-
-    const snapshot = await getDocs(q);
-    if (!snapshot.empty) {
-      Callback(false); // Pengguna sudah ada
-      return;
-    }
-
-    if (!userData.role) {
-      userData.role = "member";
-    }
-
-    userData.password = await bcrypt.hash(userData.password, 10);
-    await addDoc(collection(firestore, "users"), userData);
+    await addDoc(collection(firestore, collectionName), data);
     Callback(true); // Pengguna berhasil dibuat
   } catch (error) {
     console.error("Error signing up:", error);
     Callback(false);
-  }
-}
-
-export async function signIn(email: string) {
-  try {
-    const q = query(
-      collection(firestore, "users"),
-      where("email", "==", email)
-    );
-    const snapshot = await getDocs(q);
-    const data = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    console.log("SignIn data:", data);
-
-    if (data.length > 0) {
-      return data[0];
-    } else {
-      return null; // Pengguna tidak ditemukan
-    }
-  } catch (error) {
-    console.error("Error signing in:", error);
-    throw new Error("Gagal masuk");
-  }
-}
-
-export async function loginWithGoogle(data: any, Callback: Function) {
-  try {
-    const q = query(
-      collection(firestore, "users"),
-      where("email", "==", data.email)
-    );
-    const snapshot = await getDocs(q);
-    const user = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    console.log("loginWithGoogle data:", user);
-
-    if (user.length > 0) {
-      Callback(user[0]);
-    } else {
-      data.role = "member";
-      await addDoc(collection(firestore, "users"), data).then(() => {
-        console.log("Pengguna baru dibuat:", data);
-        Callback(data);
-      });
-    }
-  } catch (error) {
-    console.error("Error dalam login dengan Google:", error);
-    Callback(null);
   }
 }

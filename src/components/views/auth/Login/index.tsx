@@ -2,6 +2,8 @@ import { useRouter } from "next/router";
 import styles from "./Login.module.scss";
 import { FormEvent, useState } from "react";
 import { signIn } from "next-auth/react";
+import Input from "../../../UI/Input";
+import Button from "../../../UI/Button";
 
 const LoginView = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -76,37 +78,26 @@ const LoginView = () => {
         {isLoading && <div className={styles.spinner}>Loading...</div>}
         {error && <div className={styles.error}>{error}</div>}
         <form onSubmit={handleSubmit}>
-          <div className={styles.login__form__item}>
-            <label htmlFor="email">E-Mail</label>
-            <input
-              name="email"
-              id="email"
-              type="email"
-              className={styles.login__form__item__input}
-            />
-          </div>
-          <div className={styles.login__form__item}>
-            <label htmlFor="password">Password</label>
-            <input
-              name="password"
-              id="password"
-              type="password"
-              className={styles.login__form__item__input}
-            />
-          </div>
-          <button type="submit" className={styles.login__form__button}>
-            Login
-          </button>
+          <Input label="Email" type="email" name="email" />
+          <Input label="Password" type="password" name="password" />
+          <Button
+            type="submit"
+            onClick={() => {}} // Tambahkan onClick kosong di sini
+            variant="primary"
+            className={styles.login__form__button}
+          >
+            {isLoading ? "Loading..." : "Login"}
+          </Button>
           <hr className={styles.login__form__devider} />
           <div className={styles.login__form__other} />
-          <button
+          <Button
             type="button"
+            className={styles.login__form__other__button}
             onClick={handleGoogleLogin}
-            className={styles.login__form__other__buttonGoogle}
+            variant="google"
           >
-            <i className="bx bxl-google" />
-            Login Dengan Google
-          </button>
+            <i className="bx bxl-google" /> Login With Google
+          </Button>
         </form>
       </div>
       <p className={styles.login__link}>
