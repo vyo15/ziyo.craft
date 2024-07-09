@@ -4,6 +4,8 @@ import { FormEvent, useState } from "react";
 import { signIn } from "next-auth/react";
 import Input from "../../../UI/Input";
 import Button from "../../../UI/Button";
+import Link from "next/link";
+import AuthLayout from "../../../layouts/AuthLayout";
 
 const LoginView = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -52,58 +54,44 @@ const LoginView = () => {
   };
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    setError("");
     try {
-      const res = await signIn("google", { redirect: false, callbackUrl });
-      console.log("Google signIn response:", res);
-
-      if (!res?.error) {
-        setIsLoading(false);
-        push(callbackUrl);
-      } else {
-        setIsLoading(false);
-        setError("Login Google gagal");
-      }
+      await signIn("google", { callbackUrl });
     } catch (error) {
-      setIsLoading(false);
-      setError("Login Google gagal");
+      setError("Gagal login dengan Google");
     }
   };
 
   return (
-    <div className={styles.login}>
-      <h1 className={styles.login__title}>Login</h1>
-      <div className={styles.login__form}>
-        {isLoading && <div className={styles.spinner}>Loading...</div>}
-        {error && <div className={styles.error}>{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <Input label="Email" type="email" name="email" />
-          <Input label="Password" type="password" name="password" />
-          <Button
-            type="submit"
-            onClick={() => {}} // Tambahkan onClick kosong di sini
-            variant="primary"
-            className={styles.login__form__button}
-          >
-            {isLoading ? "Loading..." : "Login"}
-          </Button>
-          <hr className={styles.login__form__devider} />
-          <div className={styles.login__form__other} />
+    <AuthLayout
+      title="Login"
+      error={error}
+      link="/auth/register"
+      linkText="Belum punya akun? Daftar"
+    >
+      <form onSubmit={handleSubmit}>
+        <Input label="Email" type="email" name="email" />
+        <Input label="Password" type="password" name="password" />
+        <Button
+          type="submit"
+          onClick={() => {}}
+          variant="primary"
+          className={styles.login__button}
+        >
+          {isLoading ? "Loading..." : "Login"}
+        </Button>
+        <hr className={styles.login__devider} />
+        <div className={styles.login__other}>
           <Button
             type="button"
-            className={styles.login__form__other__button}
+            className={styles.login__other__button}
             onClick={handleGoogleLogin}
             variant="google"
           >
             <i className="bx bxl-google" /> Login With Google
           </Button>
-        </form>
-      </div>
-      <p className={styles.login__link}>
-        Belum punya akun? <a href="register">Daftar disini</a>
-      </p>
-    </div>
+        </div>
+      </form>
+    </AuthLayout>
   );
 };
 

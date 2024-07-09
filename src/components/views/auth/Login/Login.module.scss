@@ -1,51 +1,26 @@
 .login {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
+  &__button {
+    width: 100%;
+  }
 
-  &__title {
-    font-size: 32px;
+  &__devider {
+    margin-top: 10px;
     margin-bottom: 10px;
   }
-  &__form {
-    width: 30%;
-    padding: 20px;
-    box-shadow: 0 0 3px rgb(0, 0, 0, 0.3);
-    margin-bottom: 20px;
+
+  &__other {
+    width: 100%;
+
     &__button {
       width: 100%;
-    }
-    &__devider {
-      margin-top: 10px;
-      margin-bottom: 10px;
-    }
-    &__other {
-      width: 100%;
-      &__buttonGoogle {
-        cursor: pointer;
-        background-color: #4285f4;
-        color: #ffffff;
-        width: 100%;
-        padding: 10px;
-        border: none;
-        gap: 5px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
 
-        i {
-          font-size: 24px;
-        }
+      i {
+        font-size: 24px;
       }
-    }
-  }
-  &__link {
-    a {
-      cursor: pointer;
-      color: aqua;
     }
   }
 }

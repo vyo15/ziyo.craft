@@ -1,27 +1,5 @@
 .register {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
-
-  &__title {
-    font-size: 32px;
-    margin-bottom: 10px;
-  }
-  &__form {
-    width: 30%;
-    padding: 20px;
-    box-shadow: 0 0 3px rgb(0, 0, 0, 0.3);
-    margin-bottom: 20px;
-    &__button {
+  &__button {
       width: 100%;
     }
-  }
-
-  &__link {
-    a {
-        color: aqua;
-    }}
 }

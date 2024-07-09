@@ -1,0 +1,35 @@
+.auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+
+  &__error {
+    color: red;
+    margin-bottom: 10px;
+  }
+
+  &__title {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+
+  &__form {
+    width: 30%;
+    padding: 20px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+  }
+
+  &__link {
+    margin-top: 10px;
+    text-align: center;
+    width: 100%; /* Pastikan teks di dalam elemen ini penuh */
+    
+    a {
+      color: aqua;
+    }
+  }
+}
