@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next";
-import { requireAdmin } from "@/lib/utils/auth/auth";
-import DashboardAdminView from "@/components/views/admin/Dashboard";
+import { requireAdmin } from "../../lib/utils/auth/auth";
+import DashboardAdminView from "../../components/views/admin/Dashboard";
 
 const AdminPage = () => {
   return (
@@ -10,6 +10,8 @@ const AdminPage = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = requireAdmin;
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  return requireAdmin(context);
+};
 
 export default AdminPage;
