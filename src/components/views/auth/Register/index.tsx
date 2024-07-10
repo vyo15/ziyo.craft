@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import Input from "../../../UI/Input";
 import Button from "../../../UI/Button";
 import authServices from "@/services/auth";
-import AuthLayout from "@/components/layouts/AuthLayout";
+import AuthLayout from "../../../layouts/AuthLayout";
 import Link from "next/link";
 
 const RegisterView = () => {
