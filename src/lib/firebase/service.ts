@@ -6,6 +6,7 @@ import {
   getDocs,
   getFirestore,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import app from "./init";
@@ -67,6 +68,22 @@ export async function addData(
     Callback(true); // Pengguna berhasil dibuat
   } catch (error) {
     console.error("Error signing up:", error);
+    Callback(false);
+  }
+}
+
+export async function updateData(
+  collectionName: string,
+  id: string,
+  data: any,
+  Callback: Function
+) {
+  try {
+    const docRef = doc(firestore, collectionName, id);
+    await updateDoc(docRef, data);
+    Callback(true); // Pengguna berhasil diperbarui
+  } catch (error) {
+    console.error("Error updating user:", error);
     Callback(false);
   }
 }

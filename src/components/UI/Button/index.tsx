@@ -3,10 +3,11 @@ import styles from "./button.module.scss";
 
 type PropTypes = {
   type: "button" | "submit" | "reset" | undefined;
-  onClick: () => void;
+  onClick?: () => void; // onClick should be optional
   children: React.ReactNode;
   variant?: "primary" | "secondary" | "google"; // tambahkan varian lain jika diperlukan
   className?: string;
+  disabled?: boolean; // add disabled prop
 };
 
 const Button: React.FC<PropTypes> = ({
@@ -15,6 +16,7 @@ const Button: React.FC<PropTypes> = ({
   children,
   variant = "primary",
   className,
+  disabled,
 }) => {
   return (
     <button
@@ -23,6 +25,7 @@ const Button: React.FC<PropTypes> = ({
       className={`${styles.button} ${styles[variant]} ${
         className ? className : ""
       }`}
+      disabled={disabled} // handle disabled prop
     >
       {children}
     </button>

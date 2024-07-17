@@ -14,8 +14,10 @@
     }
     thead {
       tr {
-        background-color: black;
         color: white;
+        th {
+          background-color: black; // Ensure headers have a solid background          
+        }
       }
     }
     tr:nth-child(even) {
@@ -24,11 +26,41 @@
     tr:hover {
       background-color: #ddd;
     }
-  &__actions {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    align-items: center;
+    &__actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      align-items: center;
+      button {
+        color: white; /* White text */
+        padding: 10px 24px; /* Add some padding */
+        cursor: pointer; /* Add a pointer cursor on hover */
+        border-radius: 4px; /* Rounded corners */
+        transition: background-color 0.3s, transform 0.3s; /* Animation for hover effect */
+        &:hover {
+          transform: scale(1.05); /* Slightly increase the size */
+        }
+        &:active {
+          transform: scale(1); /* Reset size when clicked */
+        }
+      }
+      &__edit {
+        cursor: pointer;
+        background-color: #4caf50;
+        &:hover {
+          background-color: #45a049;
+        }
+      }
+      &__delete {
+        cursor: pointer;
+        background-color: #f44336;
+        &:hover {
+          background-color: #da190b;
+        }
+      }
+    }
+    i {
+      font-size: 20px;
+    }
   }
-}
 }
