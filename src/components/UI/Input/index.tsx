@@ -8,13 +8,20 @@ type PropTypes = {
   placeholder?: string;
   defaultValue?: string;
   disabled?: boolean;
+  className?: string;
 };
 
-const Input = (props: PropTypes) => {
-  const { label, name, type, placeholder, defaultValue, disabled } = props;
-
+const Input: React.FC<PropTypes> = ({
+  label,
+  name,
+  type,
+  placeholder,
+  defaultValue,
+  disabled,
+  className,
+}) => {
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${className}`}>
       {label && <label htmlFor={name}>{label}</label>}
       <input
         name={name}

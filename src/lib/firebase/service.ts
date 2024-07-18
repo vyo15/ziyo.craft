@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -13,7 +14,7 @@ import app from "./init";
 
 const firestore = getFirestore(app);
 
-export async function retrieveData(collectionName: string) {
+export async function retrieveData(collectionName: string): Promise<any[]> {
   try {
     const snapshot = await getDocs(collection(firestore, collectionName));
     const data = snapshot.docs.map((doc) => ({
@@ -27,7 +28,10 @@ export async function retrieveData(collectionName: string) {
   }
 }
 
-export async function retrieveDataById(collectionName: string, id: string) {
+export async function retrieveDataById(
+  collectionName: string,
+  id: string
+): Promise<any> {
   try {
     const snapshot = await getDoc(doc(firestore, collectionName, id));
     if (snapshot.exists()) {
@@ -45,7 +49,7 @@ export async function retrieveDataByField(
   collectionName: string,
   field: string,
   value: string
-) {
+): Promise<any[]> {
   const q = query(
     collection(firestore, collectionName),
     where(field, "==", value)
@@ -61,14 +65,14 @@ export async function retrieveDataByField(
 export async function addData(
   collectionName: string,
   data: any,
-  Callback: Function
-) {
+  callback: (success: boolean) => void
+): Promise<void> {
   try {
     await addDoc(collection(firestore, collectionName), data);
-    Callback(true); // Pengguna berhasil dibuat
+    callback(true); // Pengguna berhasil dibuat
   } catch (error) {
     console.error("Error signing up:", error);
-    Callback(false);
+    callback(false);
   }
 }
 
@@ -76,14 +80,29 @@ export async function updateData(
   collectionName: string,
   id: string,
   data: any,
-  Callback: Function
-) {
+  callback: (success: boolean) => void
+): Promise<void> {
   try {
     const docRef = doc(firestore, collectionName, id);
     await updateDoc(docRef, data);
-    Callback(true); // Pengguna berhasil diperbarui
+    callback(true);
   } catch (error) {
-    console.error("Error updating user:", error);
-    Callback(false);
+    console.error("Error updating data:", error);
+    callback(false);
+  }
+}
+
+export async function deleteData(
+  collectionName: string,
+  id: string,
+  callback: (success: boolean) => void
+): Promise<void> {
+  try {
+    const docRef = doc(firestore, collectionName, id);
+    await deleteDoc(docRef);
+    callback(true); // Pengguna berhasil dihapus
+  } catch (error) {
+    console.error("Error deleting data:", error);
+    callback(false);
   }
 }

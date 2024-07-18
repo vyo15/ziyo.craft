@@ -3,14 +3,25 @@ import AdminLayout from "@/components/layouts/AdminLayout";
 import styles from "./Users.module.scss";
 import Button from "@/components/UI/Button";
 import ModalUpdateUser from "./ModalUpdateUser";
+import ModalDeleteUser from "./ModalDeleteUser";
+import userServices from "@/services/user";
+
+type User = {
+  id: string;
+  fullname: string;
+  email: string;
+  phone: string;
+  role: string;
+};
 
 type PropTypes = {
-  users: any;
+  users: User[];
 };
 
 const UsersAdminView: React.FC<PropTypes> = ({ users }) => {
-  const [updatedUser, setUpdatedUser] = useState<any>(null);
-  const [usersData, setUsersData] = useState([]);
+  const [updatedUser, setUpdatedUser] = useState<User | null>(null);
+  const [deletedUser, setDeletedUser] = useState<User | null>(null);
+  const [usersData, setUsersData] = useState<User[]>([]);
 
   useEffect(() => {
     setUsersData(users);
@@ -33,7 +44,7 @@ const UsersAdminView: React.FC<PropTypes> = ({ users }) => {
               </tr>
             </thead>
             <tbody>
-              {usersData.map((user: any, index: number) => (
+              {usersData.map((user, index) => (
                 <tr key={user.id}>
                   <td>{index + 1}</td>
                   <td>{user.fullname || "-"}</td>
@@ -52,7 +63,7 @@ const UsersAdminView: React.FC<PropTypes> = ({ users }) => {
                       <Button
                         className={styles.users__table__actions__delete}
                         type="button"
-                        onClick={() => {}}
+                        onClick={() => setDeletedUser(user)}
                       >
                         <i className="bx bx-trash" />
                       </Button>
@@ -64,10 +75,17 @@ const UsersAdminView: React.FC<PropTypes> = ({ users }) => {
           </table>
         </div>
       </AdminLayout>
-      {updatedUser && Object.keys(updatedUser).length > 0 && (
+      {updatedUser && (
         <ModalUpdateUser
           updatedUser={updatedUser}
           setUpdatedUser={setUpdatedUser}
+          setUsersData={setUsersData}
+        />
+      )}
+      {deletedUser && (
+        <ModalDeleteUser
+          deletedUser={deletedUser}
+          setDeletedUser={setDeletedUser}
           setUsersData={setUsersData}
         />
       )}
