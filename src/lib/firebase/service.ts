@@ -35,7 +35,7 @@ export async function retrieveDataById(
   try {
     const snapshot = await getDoc(doc(firestore, collectionName, id));
     if (snapshot.exists()) {
-      return snapshot.data();
+      return { id: snapshot.id, ...snapshot.data() };
     } else {
       throw new Error("Dokumen tidak ditemukan");
     }
@@ -50,26 +50,31 @@ export async function retrieveDataByField(
   field: string,
   value: string
 ): Promise<any[]> {
-  const q = query(
-    collection(firestore, collectionName),
-    where(field, "==", value)
-  );
-  const snapshot = await getDocs(q);
-  const data = snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
-  return data;
+  try {
+    const q = query(
+      collection(firestore, collectionName),
+      where(field, "==", value)
+    );
+    const snapshot = await getDocs(q);
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return data;
+  } catch (error) {
+    console.error("Error retrieving data by field:", error);
+    throw new Error("Gagal mengambil data berdasarkan field");
+  }
 }
 
 export async function addData(
   collectionName: string,
   data: any,
-  callback: (success: boolean) => void
+  callback: (success: boolean, res?: any) => void
 ): Promise<void> {
   try {
-    await addDoc(collection(firestore, collectionName), data);
-    callback(true); // Pengguna berhasil dibuat
+    const docRef = await addDoc(collection(firestore, collectionName), data);
+    callback(true, { id: docRef.id });
   } catch (error) {
     console.error("Error signing up:", error);
     callback(false);
@@ -100,7 +105,7 @@ export async function deleteData(
   try {
     const docRef = doc(firestore, collectionName, id);
     await deleteDoc(docRef);
-    callback(true); // Pengguna berhasil dihapus
+    callback(true);
   } catch (error) {
     console.error("Error deleting data:", error);
     callback(false);

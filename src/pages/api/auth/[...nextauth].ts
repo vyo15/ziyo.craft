@@ -1,35 +1,44 @@
 import NextAuth, { DefaultSession, NextAuthOptions } from "next-auth";
-import { JWT } from "next-auth/jwt";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { loginWithGoogle, signIn } from "../../../services/auth/services";
 import { compare } from "bcrypt";
+import jwt from "jsonwebtoken";
+import { loginWithGoogle, signIn } from "../../../services/auth/services";
 
 // Extend the User type
 declare module "next-auth" {
   interface Session {
     user: {
+      id: string;
       email: string;
-      fullname?: string;
-      phone?: string;
-      role?: string;
+      fullname?: string | null;
+      phone?: string | null;
+      role?: string | null;
+      image?: string | null;
     } & DefaultSession["user"];
+    accessToken: string;
   }
 
   interface User {
+    id: string;
     email: string;
-    fullname?: string;
-    phone?: string;
-    role?: string;
+    fullname?: string | null;
+    phone?: string | null;
+    role?: string | null;
+    image?: string | null;
+    accessToken?: string; // accessToken made optional
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
+    id: string;
     email: string;
-    fullname?: string;
-    phone?: string;
-    role?: string;
+    fullname?: string | null;
+    phone?: string | null;
+    role?: string | null;
+    image?: string | null;
+    accessToken: string;
   }
 }
 
@@ -80,75 +89,75 @@ const authOptions: NextAuthOptions = {
 
   callbacks: {
     async jwt({ token, account, user }) {
-      console.log(
-        "JWT Callback - token:",
-        token,
-        "account:",
-        account,
-        "user:",
-        user
-      );
       if (account?.provider === "credentials" && user) {
+        token.id = user.id;
         token.email = user.email;
-        token.fullname = user.fullname;
-        token.phone = user.phone;
-        token.role = user.role;
+        token.fullname = user.fullname ?? null;
+        token.phone = user.phone ?? null;
+        token.role = user.role ?? null;
+        token.image = user.image ?? null;
+        if (user.accessToken) {
+          token.accessToken = user.accessToken;
+        }
       }
 
       if (account?.provider === "google" && user) {
         const data = {
-          fullname: user.name,
-          email: user.email,
+          fullname: user.name ?? "",
+          email: user.email ?? "",
+          image: user.image ?? "",
           type: "google",
         };
 
         try {
-          await loginWithGoogle(data, (result: any) => {
-            console.log("Google login result:", result);
-            token.email = result.email;
-            token.fullname = result.fullname;
-            token.role = result.role;
+          const result = await new Promise<{
+            id: string;
+            email: string;
+            fullname: string;
+            role: string;
+            image: string;
+            accessToken: string;
+          }>((resolve, reject) => {
+            loginWithGoogle(data, (status: boolean, res: any) => {
+              if (status) {
+                resolve(res);
+              } else {
+                reject(new Error("Login with Google failed"));
+              }
+            });
           });
+
+          token.id = result.id;
+          token.email = result.email;
+          token.fullname = result.fullname;
+          token.role = result.role;
+          token.image = result.image;
+          token.accessToken = result.accessToken;
         } catch (error) {
           console.error("Error login dengan Google:", error);
         }
       }
       return token;
     },
-    async session({ session, token }: any) {
-      console.log("Session Callback - session:", session, "token:", token);
-      if (token.email) {
-        session.user.email = token.email;
-      }
-      if (token.fullname) {
-        session.user.fullname = token.fullname;
-      }
-      if (token.phone) {
-        session.user.phone = token.phone;
-      }
-      if (token.role) {
-        session.user.role = token.role;
-      }
+    async session({ session, token }) {
+      session.user.id = token.id;
+      session.user.email = token.email;
+      session.user.fullname = token.fullname;
+      session.user.phone = token.phone;
+      session.user.role = token.role;
+      session.user.image = token.image;
 
+      const accessToken = jwt.sign(token, process.env.NEXTAUTH_SECRET || "", {
+        algorithm: "HS256",
+      });
+
+      session.accessToken = accessToken;
       return session;
     },
     async signIn({ user, account, profile, email, credentials }) {
-      console.log(
-        "signIn Callback - user:",
-        user,
-        "account:",
-        account,
-        "profile:",
-        profile,
-        "email:",
-        email,
-        "credentials:",
-        credentials
-      );
       return true;
     },
     async redirect({ url, baseUrl }) {
-      console.log("Redirect Callback - url:", url, "baseUrl:", baseUrl);
       return baseUrl;
     },
   },

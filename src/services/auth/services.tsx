@@ -27,7 +27,6 @@ export async function signUp(
     addData("users", userData, (res: boolean) => {
       result = res;
       Callback(result);
-      console.log(result);
     });
   } catch (error) {
     console.error("Error signing up:", error);
@@ -38,8 +37,6 @@ export async function signUp(
 export async function signIn(email: string) {
   try {
     const data = await retrieveDataByField("users", "email", email);
-
-    console.log("SignIn data:", data);
 
     if (data.length > 0) {
       return data[0];
@@ -54,35 +51,37 @@ export async function signIn(email: string) {
 
 export async function loginWithGoogle(
   data: {
+    id?: string; // Optional because it will be set after adding the user
     email: string;
     role?: string;
+    image?: string;
     created_at?: Date;
     update_at?: Date;
     password?: string;
   },
-  Callback: Function
+  Callback: (status: boolean, res?: any) => void
 ) {
   try {
     const user = await retrieveDataByField("users", "email", data.email);
-    console.log("loginWithGoogle data:", user);
 
     if (user.length > 0) {
-      Callback(user[0]);
+      Callback(true, user[0]);
     } else {
       data.role = "member";
       data.created_at = new Date();
       data.update_at = new Date();
       data.password = "";
-      let result;
-      await addData("users", data, (res: boolean) => {
-        result = res;
-        if (result) {
-          Callback(data);
+      await addData("users", data, (status: boolean, res?: any) => {
+        if (status) {
+          data.id = res.id;
+          Callback(true, data);
+        } else {
+          Callback(false, null);
         }
       });
     }
   } catch (error) {
     console.error("Error dalam login dengan Google:", error);
-    Callback(null);
+    Callback(false, null);
   }
 }

@@ -16,7 +16,7 @@ export default async function handler(
         status: true,
         statusCode: 200,
         message: "successfully",
-        data: users,
+        data: data, // Make sure we are returning the correct data variable
       });
     } catch (error) {
       res.status(500).json({

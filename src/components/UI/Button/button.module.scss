@@ -17,15 +17,17 @@
 }
 
 .secondary {
+  border-radius: 5px;
   background-color: #444;
-    color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease,
+    transform 0.3s ease;
 
-    &:hover {
-      background-color: #555;
-      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-      transform: scale(1.05);
+  &:hover {
+    background-color: #555;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
   }
 }
 
@@ -40,6 +42,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+  &:hover {
+    background-color: #357ae8;
+  }
 
   i {
     font-size: 24px;

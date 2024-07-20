@@ -37,7 +37,6 @@ const LoginView = () => {
         password,
         callbackUrl,
       });
-      console.log("Credential signIn response:", res);
 
       if (!res?.error) {
         setIsLoading(false);

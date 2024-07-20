@@ -8,6 +8,13 @@ export const userServices = {
   deleteUser: (id: string) => {
     return instance.delete("/api/user", { data: { id } });
   },
+  getProfile: (token: string) => {
+    return instance.get("/api/user/profile", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
 };
 
 export default userServices;

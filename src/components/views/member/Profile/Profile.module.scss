@@ -1,0 +1,91 @@
+.profile {
+  &__title {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  &__main {
+    margin-top: 40px;
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    justify-content: center;
+
+    &__avatar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 25%;
+      padding: 20px;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+
+      img {
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      &__label {
+        margin-top: 10px;
+        font-size: 16px;
+        color: #333;
+      }
+
+      &__input {
+        margin-top: 10px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+
+      &__error {
+        margin-top: 10px;
+        color: red;
+        font-size: 12px;
+      }
+    }
+
+    &__info {
+      padding: 40px;
+      border-radius: 8px;
+      width: 75%;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"] {
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-size: 16px;
+        }
+
+        button {
+          padding: 10px 20px;
+          font-size: 16px;
+          background: #333;
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+
+          &:hover {
+            background: #555;
+          }
+        }
+      }
+    }
+  }
+}

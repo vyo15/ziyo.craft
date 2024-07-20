@@ -1,0 +1,60 @@
+import type { NextApiRequest, NextApiResponse } from "next";
+import jwt from "jsonwebtoken";
+import { retrieveDataById } from "@/lib/firebase/service";
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method === "GET") {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (token) {
+      jwt.verify(
+        token,
+        process.env.NEXTAUTH_SECRET || "",
+        async (err: any, decoded: any) => {
+          if (err) {
+            console.error("Token verification error:", err); // Debug log
+            return res.status(401).json({
+              status: false,
+              statusCode: 401,
+              message: "Invalid token",
+            });
+          }
+          if (decoded) {
+            try {
+              const profile = await retrieveDataById("users", decoded.id); // Use decoded.id
+              return res.status(200).json({
+                status: true,
+                statusCode: 200,
+                message: "Successfully retrieved profile",
+                data: profile,
+              });
+            } catch (fetchError) {
+              console.error("Error retrieving profile:", fetchError); // Debug log
+              return res.status(500).json({
+                status: false,
+                statusCode: 500,
+                message: "Error retrieving profile",
+              });
+            }
+          }
+        }
+      );
+    } else {
+      console.error("Token not found"); // Debug log
+      return res.status(401).json({
+        status: false,
+        statusCode: 401,
+        message: "Token not found",
+      });
+    }
+  } else {
+    res.setHeader("Allow", ["GET"]);
+    return res.status(405).json({
+      status: false,
+      statusCode: 405,
+      message: `Method ${req.method} not allowed`,
+    });
+  }
+}
