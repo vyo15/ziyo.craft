@@ -10,9 +10,16 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 import app from "./init";
 
 const firestore = getFirestore(app);
+const storage = getStorage(app);
 
 export async function retrieveData(collectionName: string): Promise<any[]> {
   try {
@@ -110,4 +117,32 @@ export async function deleteData(
     console.error("Error deleting data:", error);
     callback(false);
   }
+}
+
+export async function uploadFile(userid: string, file: File): Promise<string> {
+  if (file.size > 1048576) {
+    throw new Error("Ukuran file maksimal 1MB.");
+  }
+
+  const newName = "profile." + file.name.split(".").pop();
+  const storageRef = ref(storage, `images/users/${userid}/${newName}`);
+  const uploadTask = uploadBytesResumable(storageRef, file);
+
+  return new Promise((resolve, reject) => {
+    uploadTask.on(
+      "state_changed",
+      null,
+      (error) => {
+        reject(error);
+      },
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          resolve(downloadURL);
+        } catch (error) {
+          reject(error);
+        }
+      }
+    );
+  });
 }

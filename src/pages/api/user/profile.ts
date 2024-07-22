@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
-import { retrieveDataById } from "@/lib/firebase/service";
+import { retrieveDataById, updateData } from "@/lib/firebase/service";
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,7 +14,7 @@ export default async function handler(
         process.env.NEXTAUTH_SECRET || "",
         async (err: any, decoded: any) => {
           if (err) {
-            console.error("Token verification error:", err); // Debug log
+            console.error("Token verification error:", err);
             return res.status(401).json({
               status: false,
               statusCode: 401,
@@ -23,15 +23,24 @@ export default async function handler(
           }
           if (decoded) {
             try {
-              const profile = await retrieveDataById("users", decoded.id); // Use decoded.id
-              return res.status(200).json({
-                status: true,
-                statusCode: 200,
-                message: "Successfully retrieved profile",
-                data: profile,
-              });
+              const profile: any = await retrieveDataById("users", decoded.id);
+              if (profile) {
+                profile.id = decoded.id;
+                res.status(200).json({
+                  status: true,
+                  statusCode: 200,
+                  message: "Successfully retrieved profile",
+                  data: profile,
+                });
+              } else {
+                res.status(404).json({
+                  status: false,
+                  statusCode: 404,
+                  message: "Profile not found",
+                });
+              }
             } catch (fetchError) {
-              console.error("Error retrieving profile:", fetchError); // Debug log
+              console.error("Error retrieving profile:", fetchError);
               return res.status(500).json({
                 status: false,
                 statusCode: 500,
@@ -42,15 +51,58 @@ export default async function handler(
         }
       );
     } else {
-      console.error("Token not found"); // Debug log
+      console.error("Token not found");
       return res.status(401).json({
         status: false,
         statusCode: 401,
         message: "Token not found",
       });
     }
+  } else if (req.method === "PUT") {
+    const { id, data } = req.body;
+    const token = req.headers.authorization?.split(" ")[1] || "";
+    jwt.verify(
+      token,
+      process.env.NEXTAUTH_SECRET || "",
+      async (err: any, decoded: any) => {
+        if (err) {
+          console.error("Token verification error:", err);
+          return res.status(401).json({
+            status: false,
+            statusCode: 401,
+            message: "Invalid token",
+          });
+        }
+        if (decoded) {
+          try {
+            await updateData("users", id, data, (status: boolean) => {
+              if (status) {
+                res.status(200).json({
+                  status: true,
+                  statusCode: 200,
+                  message: "Successfully updated",
+                });
+              } else {
+                res.status(400).json({
+                  status: false,
+                  statusCode: 400,
+                  message: "Failed to update",
+                });
+              }
+            });
+          } catch (error) {
+            console.error("Error updating profile:", error);
+            res.status(500).json({
+              status: false,
+              statusCode: 500,
+              message: "Failed to update data",
+            });
+          }
+        }
+      }
+    );
   } else {
-    res.setHeader("Allow", ["GET"]);
+    res.setHeader("Allow", ["GET", "PUT"]);
     return res.status(405).json({
       status: false,
       statusCode: 405,
