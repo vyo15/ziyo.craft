@@ -24,6 +24,7 @@ const ModalUpdateUser = (props: any) => {
 
     try {
       const result = await userServices.updateUser(updatedUser.id, data);
+      console.log("API Response:", result); // Tambahkan log ini untuk melihat respon API
       if (result.status === 200) {
         setUsersData((prevData: any) =>
           prevData.map((user: any) =>
@@ -35,6 +36,7 @@ const ModalUpdateUser = (props: any) => {
         setError("Failed to update user");
       }
     } catch (err) {
+      console.error("Update error:", err); // Tambahkan log ini untuk melihat error
       setError("An error occurred during update");
     } finally {
       setIsLoading(false);

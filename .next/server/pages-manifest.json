@@ -2,6 +2,12 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
+  "/admin/users": "pages/admin/users.js",
+  "/api/[[...user]]": "pages/api/[[...user]].js",
+  "/api/auth/[...nextauth]": "pages/api/auth/[...nextauth].js",
+  "/": "pages/index.js",
   "/auth/login": "pages/auth/login.js",
-  "/": "pages/index.js"
+  "/admin": "pages/admin.js",
+  "/member/profile": "pages/member/profile.js",
+  "/api/user/profile": "pages/api/user/profile.js"
 }

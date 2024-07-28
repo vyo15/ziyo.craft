@@ -4,32 +4,37 @@
     font-weight: bold;
     color: #333;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
   }
 
   &__main {
-    margin-top: 40px;
     display: flex;
-    gap: 40px;
+    justify-content: space-around;
     align-items: flex-start;
-    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+
+    &__avatar,
+    &__info,
+    &__password {
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      width: 100%;
+      max-width: 350px;
+    }
 
     &__avatar {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      width: 25%;
-      padding: 20px;
-      background: #fff;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
       text-align: center;
 
       &__image_container {
-        width: 200px;
-        height: 200px;
-        margin-bottom: 10px;
+        width: 150px;
+        height: 150px;
+        margin: 20px 0; // Add margin here to separate the title and the image
         position: relative;
 
         img {
@@ -47,10 +52,11 @@
         }
       }
 
-      &__label, &__error, &__filename {
-        margin-top: 10px;
-        font-size: 14px;
+      &__title {
+        font-size: 24px;
+        font-weight: bold;
         color: #333;
+        margin-bottom: 20px; // Increase margin-bottom for more space
       }
 
       &__button {
@@ -72,33 +78,40 @@
         display: none;
       }
 
-      &__error {
-        color: red;
-      }
-
       &__filename {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 200px;
+        margin-top: 10px;
+      }
+
+      &__message {
+        color: green;
+        margin-top: 10px;
+        font-size: 14px;
       }
     }
 
-    &__info {
-      padding: 40px;
-      border-radius: 8px;
-      width: 75%;
-      background: #fff;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    &__info,
+    &__password {
+      h2 {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+        margin-bottom: 20px;
+      }
 
       form {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 15px;
 
         input[type="text"],
         input[type="email"],
-        input[type="number"] {
+        input[type="number"],
+        input[type="password"] {
           padding: 10px;
           border: 1px solid #ccc;
           border-radius: 4px;
@@ -113,11 +126,19 @@
           border: none;
           border-radius: 4px;
           cursor: pointer;
+          transition: background 0.3s ease;
 
           &:hover {
             background: #555;
           }
         }
+      }
+
+      &__message {
+        color: green;
+        margin-top: 10px;
+        font-size: 14px;
+        text-align: center;
       }
     }
   }

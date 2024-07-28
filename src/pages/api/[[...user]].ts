@@ -1,4 +1,5 @@
 import { retrieveData, updateData, deleteData } from "@/lib/firebase/service";
+import { compare, hash } from "bcrypt";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -16,7 +17,7 @@ export default async function handler(
         status: true,
         statusCode: 200,
         message: "successfully",
-        data: data, // Make sure we are returning the correct data variable
+        data: data,
       });
     } catch (error) {
       res.status(500).json({
@@ -27,19 +28,53 @@ export default async function handler(
     }
   } else if (req.method === "PUT") {
     const { id, data } = req.body;
+    console.log(`Received PUT request with id: ${id}, data:`, data); // Logging
     try {
-      await updateData("users", id, data, (status: boolean) => {
-        if (status) {
-          res
-            .status(200)
-            .json({ status: true, statusCode: 200, message: "successfully" });
-        } else {
-          res
-            .status(400)
-            .json({ status: false, statusCode: 400, message: "failed" });
+      const users = await retrieveData("users");
+      const user = users.find((user: any) => user.id === id);
+      if (user) {
+        console.log(`Found user:`, user); // Logging
+        if (user.password && data.oldPassword) {
+          const passwordConfirm = await compare(
+            data.oldPassword,
+            user.password
+          );
+          if (!passwordConfirm) {
+            return res.status(400).json({
+              status: false,
+              statusCode: 400,
+              message: "Kata sandi lama tidak cocok",
+            });
+          }
         }
-      });
+
+        const updatedData = { ...user, ...data };
+        delete updatedData.oldPassword; // Hapus oldPassword dari data yang akan diupdate
+
+        await updateData("users", id, updatedData, (status: boolean) => {
+          if (status) {
+            res.status(200).json({
+              status: true,
+              statusCode: 200,
+              message: "successfully",
+            });
+          } else {
+            res.status(400).json({
+              status: false,
+              statusCode: 400,
+              message: "failed",
+            });
+          }
+        });
+      } else {
+        res.status(404).json({
+          status: false,
+          statusCode: 404,
+          message: "User tidak ditemukan",
+        });
+      }
     } catch (error) {
+      console.error("Error during PUT operation:", error); // Logging
       res.status(500).json({
         status: false,
         statusCode: 500,
@@ -51,13 +86,17 @@ export default async function handler(
     try {
       await deleteData("users", id, (status: boolean) => {
         if (status) {
-          res
-            .status(200)
-            .json({ status: true, statusCode: 200, message: "successfully" });
+          res.status(200).json({
+            status: true,
+            statusCode: 200,
+            message: "successfully",
+          });
         } else {
-          res
-            .status(400)
-            .json({ status: false, statusCode: 400, message: "failed" });
+          res.status(400).json({
+            status: false,
+            statusCode: 400,
+            message: "failed",
+          });
         }
       });
     } catch (error) {

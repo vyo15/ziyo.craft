@@ -95,6 +95,9 @@ export async function updateData(
   callback: (success: boolean) => void
 ): Promise<void> {
   try {
+    if (!collectionName || !id || !data) {
+      throw new Error("Invalid arguments for updateData");
+    }
     const docRef = doc(firestore, collectionName, id);
     await updateDoc(docRef, data);
     callback(true);

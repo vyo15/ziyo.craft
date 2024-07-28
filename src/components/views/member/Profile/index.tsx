@@ -15,6 +15,8 @@ interface ProfileProps {
     fullname: string;
     email: string;
     phone: string;
+    role: string;
+    password: string;
   };
   setProfile: (profile: {
     id: string;
@@ -22,6 +24,8 @@ interface ProfileProps {
     fullname: string;
     email: string;
     phone: string;
+    role: string;
+    password: string;
   }) => void;
   session: any;
 }
@@ -32,20 +36,139 @@ const ProfileMemberView: React.FC<ProfileProps> = ({
   session,
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [state, setState] = useState({
+    loading: {
+      profile: false,
+      password: false,
+      picture: false,
+    },
+    messages: {
+      profile: "",
+      password: "",
+      picture: "",
+    },
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const updateState = (
+    type: "loading" | "messages",
+    key: keyof typeof state.loading,
+    value: boolean | string
+  ) => {
+    setState((prev) => ({
+      ...prev,
+      [type]: {
+        ...prev[type],
+        [key]: value,
+      },
+    }));
+  };
+
+  const resetMessages = () => {
+    setState((prev) => ({
+      ...prev,
+      messages: {
+        profile: "",
+        password: "",
+        picture: "",
+      },
+    }));
+  };
+
+  const handleChangePassword = async (e: any) => {
+    e.preventDefault();
+    resetMessages();
+    updateState("loading", "password", true);
+    const form = e.target as HTMLFormElement;
+    const data = {
+      oldPassword: form.oldPassword.value,
+      newPassword: form.newPassword.value,
+    };
+    try {
+      const response = await fetch("/api/user/[[...user]]", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        body: JSON.stringify({
+          id: profile.id,
+          data,
+        }),
+      });
+
+      if (response.ok) {
+        updateState("messages", "password", "Kata sandi berhasil diperbarui");
+        form.reset(); // Kosongkan kolom input setelah berhasil
+      } else {
+        const result = await response.json();
+        updateState(
+          "messages",
+          "password",
+          result.message || "Gagal memperbarui kata sandi"
+        );
+      }
+    } catch (error) {
+      console.error("Error updating password:", error);
+      updateState("messages", "password", "Gagal memperbarui kata sandi");
+    } finally {
+      updateState("loading", "password", false);
+    }
+  };
+
+  const handleChangeProfile = async (e: any) => {
+    e.preventDefault();
+    resetMessages();
+    updateState("loading", "profile", true);
+    const form = e.target as HTMLFormElement;
+    const data = {
+      fullname: form.fullname.value,
+      phone: form.phone.value,
+    };
+
+    try {
+      const response = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        body: JSON.stringify({
+          id: profile.id,
+          data,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setProfile({ ...profile, fullname: data.fullname, phone: data.phone });
+        updateState("messages", "profile", "Profil berhasil diperbarui");
+      } else {
+        const result = await response.json();
+        updateState(
+          "messages",
+          "profile",
+          result.message || "Gagal memperbarui profil"
+        );
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      updateState("messages", "profile", "Gagal memperbarui profil");
+    } finally {
+      updateState("loading", "profile", false);
+    }
+  };
+
   const handleChangeProfilePicture = async () => {
+    resetMessages();
     if (selectedFile) {
-      setIsLoading(true);
+      updateState("loading", "picture", true);
       try {
         const downloadURL = await uploadFile(profile.id, selectedFile);
-        console.log("File berhasil diunggah, URL:", downloadURL);
         const updatedProfile = { ...profile, image: downloadURL };
         setProfile(updatedProfile);
 
-        // Update profile in the database
+        // Perbarui profil di database
         await axios.put(
           "/api/user/profile",
           { id: profile.id, data: { image: downloadURL } },
@@ -56,12 +179,13 @@ const ProfileMemberView: React.FC<ProfileProps> = ({
           }
         );
 
-        setSelectedFile(null); // Clear selected file after upload
+        setSelectedFile(null); // Hapus file yang dipilih setelah unggah
+        updateState("messages", "picture", "Foto profil berhasil diperbarui");
       } catch (error) {
         console.error("Kesalahan saat mengunggah file:", error);
-        setErrorMessage("Gagal mengunggah gambar");
+        updateState("messages", "picture", "Gagal mengunggah gambar");
       } finally {
-        setIsLoading(false);
+        updateState("loading", "picture", false);
       }
     } else {
       fileInputRef.current?.click();
@@ -72,10 +196,10 @@ const ProfileMemberView: React.FC<ProfileProps> = ({
     const file = event.target.files?.[0];
     if (file) {
       if (file.size > 1024 * 1024) {
-        setErrorMessage("Ukuran foto profil maksimal 1MB.");
+        updateState("messages", "picture", "Ukuran foto profil maksimal 1MB.");
         setSelectedFile(null);
       } else {
-        setErrorMessage("");
+        updateState("messages", "picture", "");
         setSelectedFile(file);
       }
     }
@@ -91,8 +215,9 @@ const ProfileMemberView: React.FC<ProfileProps> = ({
       <h1 className={styles.profile__title}>Halaman Profil</h1>
       <div className={styles.profile__main}>
         <div className={styles.profile__main__avatar}>
+          <h2 className={styles.profile__main__avatar__title}>Foto Profil</h2>
           <div className={styles.profile__main__avatar__image_container}>
-            {isLoading ? (
+            {state.loading.picture ? (
               <div className={styles.loader}>
                 <Oval
                   height={80}
@@ -120,12 +245,6 @@ const ProfileMemberView: React.FC<ProfileProps> = ({
               handleChangeProfilePicture();
             }}
           >
-            <label
-              className={styles.profile__main__avatar__label}
-              htmlFor="upload-image"
-            >
-              Foto Profil
-            </label>
             <input
               type="file"
               name="image"
@@ -139,7 +258,7 @@ const ProfileMemberView: React.FC<ProfileProps> = ({
               type="button"
               onClick={handleChangeProfilePicture}
             >
-              {isLoading
+              {state.loading.picture
                 ? "Mengunggah..."
                 : selectedFile
                 ? "Unggah Foto"
@@ -152,15 +271,16 @@ const ProfileMemberView: React.FC<ProfileProps> = ({
                   : selectedFile.name}
               </p>
             )}
-            {errorMessage && (
-              <div className={styles.profile__main__avatar__error}>
-                *{errorMessage}
+            {state.messages.picture && (
+              <div className={styles.profile__main__avatar__message}>
+                *{state.messages.picture}
               </div>
             )}
           </form>
         </div>
         <div className={styles.profile__main__info}>
-          <form action="">
+          <h2>Profil</h2>
+          <form onSubmit={handleChangeProfile}>
             <Input
               name="fullname"
               type="text"
@@ -172,6 +292,7 @@ const ProfileMemberView: React.FC<ProfileProps> = ({
               type="email"
               label="Email"
               defaultValue={profile.email || ""}
+              disabled
             />
             <Input
               name="phone"
@@ -179,9 +300,38 @@ const ProfileMemberView: React.FC<ProfileProps> = ({
               label="Telepon"
               defaultValue={profile.phone || ""}
             />
+            <Input
+              name="role"
+              type="text"
+              label="Peran"
+              defaultValue={profile.role || ""}
+              disabled
+            />
             <Button type="submit" variant="secondary">
-              Perbarui
+              {state.loading.profile ? "Memperbarui..." : "Perbarui"}
             </Button>
+            {state.messages.profile && (
+              <div className={styles.profile__main__info__message}>
+                *{state.messages.profile}
+              </div>
+            )}
+          </form>
+        </div>
+        <div className={styles.profile__main__password}>
+          <h2>Ubah Kata Sandi</h2>
+          <form onSubmit={handleChangePassword}>
+            <Input name="oldPassword" type="password" label="Kata Sandi Lama" />
+            <Input name="newPassword" type="password" label="Kata Sandi Baru" />
+            <Button type="submit" variant="secondary">
+              {state.loading.password
+                ? "Memperbarui..."
+                : "Perbarui Kata Sandi"}
+            </Button>
+            {state.messages.password && (
+              <div className={styles.profile__main__password__message}>
+                *{state.messages.password}
+              </div>
+            )}
           </form>
         </div>
       </div>

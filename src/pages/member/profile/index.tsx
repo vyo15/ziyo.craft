@@ -11,6 +11,7 @@ interface Profile {
   fullname: string;
   email: string;
   phone: string;
+  role: string; // Tambahkan properti role
 }
 
 const ProfilePage = () => {
